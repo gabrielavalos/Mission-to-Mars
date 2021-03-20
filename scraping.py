@@ -103,34 +103,55 @@ def mars_hemisphers(browser):
 
     browser.visit(url)
 
+    html = browser.html
+    hemisphere_soup = soup(html, 'html.parser')
+
+    hemispheres = hemisphere_soup.find_all('div', class_='item')
 
     hemisphere_image_urls = []
 
-    for i in range(4):
-        hemishepheres = {}
-        try:
-            thumbnail= browser.find_by_tag('h3')[i]
-            thumbnail.click()
+    hemispheres_url = 'https://data-class-mars-hemispheres.s3.amazonaws.com/Mars_Hemispheres/'
 
-            # Parse the hemisphere page with soup
-            html = browser.html
-            img_soup = soup(html, 'html.parser')
+    for i in hemispheres:
+        #hemisphere = {}
 
-            # Find the relative image url and nama
-            img_url = img_soup.find('img', class_='wide-image').get('src')
-            img_name= img_soup.find('h2').get_text()
+        title =  i.find('h3').text
 
-            #append to hemisphere dict
-            hemishepheres[img_url] = img_name
-            hemisphere_image_urls.append(hemishepheres)
-        except Exception:
-            pass
-        link = browser.find_link_by_href('index.html')
+        ending_img_url = i.find('a', class_='itemLink product-item')['href']
+        browser.visit(hemispheres_url + ending_img_url)
+        img_html = browser.html
+        img_soup = soup(img_html, 'html.parser')
+        img_url = hemispheres_url + img_soup.find('img', class_='wide-image')['src']
 
-        link.click()
+        hemisphere_image_urls.append({'img_url': img_url, 'title': title})
+        
+        print(hemisphere_image_urls)
+
+        # try:
+        #     thumbnail= browser.find_by_tag('h3')[i]
+        #     thumbnail.click()
+
+        #     # Parse the hemisphere page with soup
+        #     html = browser.html
+        #     img_soup = soup(html, 'html.parser')
+
+        #     # Find the relative image url and nama
+        #     img_url = img_soup.find('img', class_='wide-image').get('src')
+        #     img_name= img_soup.find('h2').get_text()
+
+        #     #append to hemisphere dict
+        #     hemisphere[img_url] = img_name
+        #     hemisphere_image_urls.append(hemisphere)
+        # except Exception:
+        #     pass
+        # link = browser.find_link_by_href('index.html')
+
+        #link.click()
 
     return hemisphere_image_urls
     #print(hemisphere_image_urls)
+
+
 
  
 
